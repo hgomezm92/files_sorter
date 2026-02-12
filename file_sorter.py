@@ -1,6 +1,6 @@
 import os, shutil
 
-PATH = '/home/aituk/Documentos/Prueba'
+PATH = ''
 
 CONFIG: dict[str, list[str]] = {
     'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp'],
