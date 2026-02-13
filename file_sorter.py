@@ -50,6 +50,27 @@ def get_category(extension: str, config: dict[str, list[str]] = CONFIG) -> str:
 
     return 'Others'
 
+def get_unique_name(filename: str, dest_path: str) -> str:
+    """
+    Get unique names for duplicate files adding (number)
+
+    Args:
+        filename: Duplicated file's name
+        dest_path: Destination path for duplicated files
+    
+    Returns:
+        A unique new name for the file
+    """
+    name, ext = os.path.splitext(filename)
+    i: int = 1
+    new_name: str = filename
+    
+    while os.path.exists(os.path.join(dest_path, new_name)):
+        new_name = f'{name}({i}){ext}'
+        i += 1
+    
+    return new_name 
+
 def create_folders(files: dict[str, str], path: str, config: dict[str, list[str]] = CONFIG) -> None:
     """
     Create needed directories to sort files taking an extension list from a
@@ -65,7 +86,7 @@ def create_folders(files: dict[str, str], path: str, config: dict[str, list[str]
     categories: set[str] = {get_category(extension, config) for extension in extensions} # set comprehension
     
     for category in categories:
-        os.makedirs(os.path.join(path, category), exist_ok=True)
+        os.makedirs(os.path.join(path, category), exist_ok = True) # exist_ok = True does not raise exception for already existing directories
 
 def move_files(files: dict[str, str], path: str, config: dict[str, list[str]] = CONFIG) -> None:
     """
@@ -80,11 +101,12 @@ def move_files(files: dict[str, str], path: str, config: dict[str, list[str]] = 
 
     for name, ext in files.items():
         category: str = get_category(ext, config)
+        new_name: str = name
         if os.path.exists(os.path.join(path, category, name)):
-            print(f'\tSkipped {name} - already exists in {category}')
-            continue
-        print(f'\tMoved {name} to {category}')
-        shutil.move(os.path.join(path, name), os.path.join(path, category, name))
+            new_name = get_unique_name(name, os.path.join(path, category))
+
+        print(f'\tMoved {new_name} to {category}')
+        shutil.move(os.path.join(path, name), os.path.join(path, category, new_name))
 
 def main(path: str = PATH):
     try:
