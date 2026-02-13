@@ -1,4 +1,4 @@
-import os, shutil
+import os, shutil, sys
 
 PATH = ''
 
@@ -87,15 +87,48 @@ def move_files(files: dict[str, str], path: str, config: dict[str, list[str]] = 
         shutil.move(os.path.join(path, name), os.path.join(path, category, name))
 
 def main(path: str = PATH):
+    try:
+        validate_path(path)
+    except (FileNotFoundError, NotADirectoryError, PermissionError) as e:
+        sys.exit(str(e))
+
+
     print(f'Organizing files in {path}...')
-    files = read_files_list(PATH)
+    files = read_files_list(path)
 
     print('Creating folders...')
-    create_folders(files, PATH, CONFIG)
+    create_folders(files, path, CONFIG)
 
-    move_files(files, PATH, CONFIG)
+    move_files(files, path, CONFIG)
 
     print(f'Done! Organized {len(files)} files.')
+
+
+def validate_path(path: str) -> None:
+    """
+    Validate that path exists, is a directory, and has read/write permissions
+    
+    Args:
+        path: Path to validate
+        
+    Raises:
+        FileNotFoundError: If path doesn't exist
+        NotADirectoryError: If path is not a directory
+        PermissionError: If missing read or write permissions
+    """
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(f'Path does not exist: {path}')
+    
+    if not os.path.isdir(path):
+        raise NotADirectoryError(f'Path is not a directory: {path}')
+    
+    if not os.access(path, os.R_OK):
+        raise PermissionError(f'No read permission for: {path}')
+    
+    if not os.access(path, os.W_OK):
+        raise PermissionError(f'No write permission for: {path}')
+
 
 if __name__ == '__main__':
     main()
