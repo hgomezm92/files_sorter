@@ -48,13 +48,6 @@ python file_sorter.py
 # or edit file_sorter.py to change PATH and then run
 ```
 
-Programmatic usage (example):
-
-```python
-from file_sorter import main
-main('/path/to/your/folder')
-```
-
 Configuration
 -------------
 Edit the `CONFIG` dictionary in `file_sorter.py` to change categories or
